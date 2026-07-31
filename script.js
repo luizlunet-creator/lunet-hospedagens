@@ -23,15 +23,29 @@ function isPlaceholderPhoto(item) {
   return item && typeof item === 'object' && item.placeholder;
 }
 
+// Fotos podem ser uma string (caminho de arquivo, formato antigo) ou um
+// objeto { src, label } quando o dono reescreveu a legenda no painel --
+// essas duas funcoes leem qualquer um dos dois formatos.
+function photoSrc(item) {
+  if (isPlaceholderPhoto(item)) return null;
+  return typeof item === 'string' ? item : item.src;
+}
 function filenameToLabel(src) {
+  if (!src) return '';
+  if (src.startsWith('data:')) return 'Foto enviada';
   const base = src.split('/').pop().replace(/\.[a-z0-9]+$/i, '');
   const words = base.replace(/[-_]+/g, ' ').replace(/\d+/g, '').trim();
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
+function photoLabel(item) {
+  if (isPlaceholderPhoto(item)) return item.label;
+  if (item && typeof item === 'object' && item.label) return item.label;
+  return filenameToLabel(photoSrc(item));
+}
 
 function photoAlt(item, listing) {
   if (isPlaceholderPhoto(item)) return `${item.label} do ${listing.title} — foto em breve`;
-  return `${filenameToLabel(item)} — ${listing.title}`;
+  return `${photoLabel(item)} — ${listing.title}`;
 }
 
 function placeholderSlideHtml(label, tagClass) {
@@ -199,7 +213,7 @@ function listingCardPhotoHtml(listing) {
   if (!cover) {
     return placeholderSlideHtml(listing.title, 'photo-placeholder-cover') + `<span class="photo-count">${countLabel}</span>`;
   }
-  return `<img src="${cover}" alt="${photoAlt(cover, listing)}" loading="lazy" decoding="async"><span class="photo-count photo-count-btn">${countLabel}</span>`;
+  return `<img src="${photoSrc(cover)}" alt="${photoAlt(cover, listing)}" loading="lazy" decoding="async"><span class="photo-count photo-count-btn">${countLabel}</span>`;
 }
 
 function renderListingGrid() {
@@ -237,7 +251,7 @@ function renderListingGrid() {
 
 function detailSlideInnerHtml(item, listing, index) {
   if (isPlaceholderPhoto(item)) return placeholderSlideHtml(item.label);
-  return `<img class="zoomable" data-photo-index="${index}" src="${item}" alt="${photoAlt(item, listing)}" loading="${index === 0 ? 'eager' : 'lazy'}" decoding="async">`;
+  return `<img class="zoomable" data-photo-index="${index}" src="${photoSrc(item)}" alt="${photoAlt(item, listing)}" loading="${index === 0 ? 'eager' : 'lazy'}" decoding="async">`;
 }
 
 function detailCarouselHtml(listing) {
@@ -261,7 +275,7 @@ function detailCarouselHtml(listing) {
     <div class="detail-thumbs" id="detailThumbs">
       ${photos.map((item, i) => `
         <button class="detail-thumb" data-thumb="${i}">
-          ${isPlaceholderPhoto(item) ? '<span class="thumb-placeholder">?</span>' : `<img src="${item}" alt="" loading="lazy">`}
+          ${isPlaceholderPhoto(item) ? '<span class="thumb-placeholder">?</span>' : `<img src="${photoSrc(item)}" alt="" loading="lazy">`}
         </button>
       `).join('')}
     </div>
@@ -340,7 +354,7 @@ function renderVideoSection() {
   grid.innerHTML = withVideo.map(l => {
     const v = l.videos[0];
     const real = (l.photos || []).filter(p => !isPlaceholderPhoto(p));
-    const cover = (v.type === 'youtube' && youtubeThumbUrl(v.src)) || real[0] || '';
+    const cover = (v.type === 'youtube' && youtubeThumbUrl(v.src)) || (real[0] ? photoSrc(real[0]) : '') || '';
     return `
       <div class="video-card" data-video-card="${l.id}">
         <button type="button" class="video-cover" data-play-video="${l.id}" aria-label="Reproduzir vídeo do ${l.title}">

@@ -1,9 +1,5 @@
 // Todo o conteudo editavel do site vive aqui.
 // O painel "Editar" le e modifica este objeto, e pode exportar uma copia atualizada deste arquivo.
-// Esta e a copia PUBLICA (publicada no GitHub Pages): o campo editPassword
-// foi removido de proposito, porque esse arquivo fica visivel pra qualquer
-// visitante do site. A senha real so existe na copia local usada pelo CRM
-// e pelo painel, que nunca sao publicados.
 
 // Links dos anuncios no Airbnb — cole aqui assim que tiver os links reais.
 // Enquanto estiverem vazios, o botao "Reservar pelo Airbnb" fica desativado

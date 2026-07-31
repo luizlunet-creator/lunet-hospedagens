@@ -58,6 +58,33 @@
     </div>
   </section>
 
+  <section class="section section-alt" id="disponibilidade">
+    <div class="section-inner">
+      <p class="eyebrow">Reserva direta</p>
+      <h2>Veja a disponibilidade e reserve direto</h2>
+      <p class="section-lead">Escolha as datas livres no calendário e faça seu pedido pelo WhatsApp — reservando direto com a gente você foge das taxas das plataformas. As datas mostradas estão sujeitas a confirmação.</p>
+      <div class="pub-cal-tabs">
+        <button type="button" class="btn-ghost btn-sm" data-pub-apt="airbnb06">AP 06</button>
+        <button type="button" class="btn-ghost btn-sm" data-pub-apt="airbnb5">AP 05</button>
+      </div>
+      <div class="pub-cal-head">
+        <button type="button" class="btn-ghost btn-sm" id="pubCalPrev" aria-label="Mês anterior">‹</button>
+        <strong id="pubCalTitle"></strong>
+        <button type="button" class="btn-ghost btn-sm" id="pubCalNext" aria-label="Próximo mês">›</button>
+      </div>
+      <div class="pub-cal-legend">
+        <span><span class="pub-cal-dot pub-dot-free"></span> Livre</span>
+        <span><span class="pub-cal-dot pub-dot-occ"></span> Ocupado</span>
+        <span><span class="pub-cal-dot pub-dot-sel"></span> Selecionado</span>
+      </div>
+      <div class="pub-cal-grid" id="pubCalGrid"></div>
+      <p class="pub-cal-sel" id="pubCalSel"></p>
+      <div class="hero-actions">
+        <a class="btn-whatsapp is-disabled" id="pubCalWhats" target="_blank" rel="noopener">Pedir reserva pelo WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
   <section class="section section-alt video-section" id="videoSection" style="display:none;">
     <div class="section-inner">
       <p class="eyebrow">Conheça por dentro</p>
@@ -139,6 +166,8 @@
 </div>
 
 <script src="content.js"></script>
+<script src="disponibilidade.js"></script>
 <script src="script.js"></script>
+<script src="public-calendar.js"></script>
 </body>
 </html>
