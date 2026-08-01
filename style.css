@@ -996,3 +996,16 @@ select.edit-input option{
   .pub-cal-cell{font-size:12px; border-radius:8px;}
   .pub-cal-head strong{font-size:16px; min-width:120px;}
 }
+
+/* ---------------- Ficha de check-in pública ---------------- */
+.checkin-inner{max-width:640px;}
+.checkin-card{
+  background:var(--bg-card); border:1px solid rgba(198,255,46,.15);
+  border-radius:var(--radius); padding:24px;
+}
+.checkin-card label{display:block; margin:14px 0 6px; font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.3px;}
+.checkin-card label:first-child{margin-top:0;}
+.checkin-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.checkin-privacy{margin-top:18px;}
+.checkin-error{color:#ff9a9d; font-weight:700; min-height:18px; text-align:center;}
+@media (max-width:480px){ .checkin-grid{grid-template-columns:1fr;} .checkin-card{padding:16px;} }

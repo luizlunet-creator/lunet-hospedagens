@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha de check-in — Prédio Lunet</title>
+<meta name="description" content="Preencha sua ficha de check-in do Prédio Lunet antes de chegar. Os dados vão direto pro nosso WhatsApp — nada fica salvo neste site.">
+<meta name="robots" content="noindex, follow">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand">
+      <img src="assets/logo-lunet-cropped.png" alt="Prédio Lunet" class="brand-logo">
+      <span class="brand-name">Prédio Lunet</span>
+    </a>
+    <a class="btn-ghost btn-sm" href="index.html">← Voltar ao site</a>
+  </div>
+</header>
+
+<main>
+  <section class="section">
+    <div class="section-inner checkin-inner">
+      <p class="eyebrow">Sua chegada</p>
+      <h2>Ficha de check-in</h2>
+      <p class="section-lead">Preencha os dados abaixo antes da sua chegada — assim deixamos tudo pronto pra te receber. Ao enviar, as informações vão <strong>direto pro nosso WhatsApp</strong>: nada fica salvo neste site.</p>
+
+      <div class="checkin-card">
+        <label>Apartamento reservado *</label>
+        <select class="edit-input" id="fcApartamento">
+          <option value="">— selecione —</option>
+          <option value="AP 06">AP 06</option>
+          <option value="AP 05">AP 05</option>
+          <option value="Os dois (AP 05 + AP 06)">Os dois (AP 05 + AP 06)</option>
+        </select>
+
+        <label>Nome completo *</label>
+        <input class="edit-input" id="fcNome" autocomplete="name" placeholder="Como no documento">
+
+        <label>CPF ou documento (RG/passaporte) *</label>
+        <input class="edit-input" id="fcDocumento" placeholder="Somente do responsável pela reserva">
+
+        <label>Telefone / WhatsApp</label>
+        <input class="edit-input" id="fcTelefone" inputmode="tel" autocomplete="tel" placeholder="(47) 99999-9999">
+
+        <label>Cidade e estado de onde vem</label>
+        <input class="edit-input" id="fcCidade" placeholder="Ex: Curitiba/PR">
+
+        <div class="checkin-grid">
+          <div>
+            <label>Data de chegada *</label>
+            <input class="edit-input" id="fcChegada" type="text" inputmode="numeric" placeholder="DD/MM/AAAA" maxlength="10">
+          </div>
+          <div>
+            <label>Data de saída *</label>
+            <input class="edit-input" id="fcSaida" type="text" inputmode="numeric" placeholder="DD/MM/AAAA" maxlength="10">
+          </div>
+        </div>
+
+        <div class="checkin-grid">
+          <div>
+            <label>Adultos *</label>
+            <input class="edit-input" id="fcAdultos" type="number" min="1" max="10" step="1" value="2">
+          </div>
+          <div>
+            <label>Crianças</label>
+            <input class="edit-input" id="fcCriancas" type="number" min="0" max="10" step="1" value="0">
+          </div>
+        </div>
+
+        <label>Horário previsto de chegada</label>
+        <input class="edit-input" id="fcHorario" placeholder="Ex: entre 15h e 16h">
+
+        <label>Placa do carro (se vier de carro — pro estacionamento)</label>
+        <input class="edit-input" id="fcPlaca" placeholder="Ex: ABC1D23">
+
+        <label>Alguma observação?</label>
+        <textarea class="edit-input" id="fcObs" rows="2" placeholder="Ex: chegamos com bebê, precisamos de berço"></textarea>
+
+        <p class="note checkin-privacy">🔒 Privacidade: este site não guarda nem envia seus dados pra nenhum servidor. O botão abaixo só abre o WhatsApp com a ficha pronta — você revisa e envia você mesmo.</p>
+
+        <div class="hero-actions">
+          <a class="btn-whatsapp" id="fcEnviar" target="_blank" rel="noopener">Enviar ficha pelo WhatsApp</a>
+        </div>
+        <p class="note checkin-error" id="fcErro"></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="content.js"></script>
+<script src="checkin.js"></script>
+</body>
+</html>
