@@ -1020,3 +1020,28 @@ select.edit-input option{
 .desp-valor{font-weight:800; color:var(--white); margin-left:auto;}
 .desp-row .mini-btn{margin:0;}
 .desp-total{text-align:right;}
+
+/* ---------------- Planejamento anual ---------------- */
+.plan-config-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+.plan-expense-row{display:flex; gap:8px; align-items:center; margin-bottom:6px;}
+.plan-expense-row .edit-input{margin:0;}
+.plan-expense-row .plan-valor{max-width:130px; flex:0 0 auto;}
+.plan-expense-row .mini-btn{margin:0; padding:6px 12px; flex:0 0 auto;}
+.plan-total-line{text-align:right; font-size:14px;}
+.plan-total-line strong{color:var(--green-lime); font-size:16px;}
+.plan-table th small{font-weight:400; color:var(--muted); text-transform:none;}
+.plan-table .plan-diarias{margin:0; max-width:90px; text-align:center;}
+.plan-table tfoot td{border-top:2px solid rgba(198,255,46,.3); background:rgba(198,255,46,.06);}
+.plan-row-empty{opacity:.45;}
+.plan-neg{color:#ff9a9d;}
+.plan-neg strong{color:#ff9a9d;}
+@media (max-width:720px){ .plan-config-grid{grid-template-columns:1fr 1fr;} }
+
+/* Planejamento: salvar, dicas */
+.plan-save-row{display:flex; gap:12px; align-items:center; margin-top:14px; flex-wrap:wrap;}
+.plan-save-row .mini-btn{margin:0;}
+.plan-dica{
+  padding:10px 14px; border-radius:10px; margin-bottom:6px;
+  background:var(--bg-dark); border:1px solid rgba(198,255,46,.12);
+  font-size:13.5px; color:var(--muted); line-height:1.5;
+}
