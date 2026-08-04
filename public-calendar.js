@@ -98,17 +98,24 @@
   function onDayClick(dayISO) {
     // sem inicio, ou intervalo ja fechado -> comeca de novo
     if (!selIn || (selIn && selOut)) { selIn = dayISO; selOut = null; render(); return; }
-    // tem inicio, falta fim
-    if (dayISO <= selIn) { selIn = dayISO; selOut = null; render(); return; }
+    // tocou o mesmo dia de novo -> continua sendo o inicio
+    if (dayISO === selIn) { render(); return; }
+    // dois toques sempre formam um intervalo, em QUALQUER ordem: se a pessoa
+    // tocar primeiro na data de saida e depois na de entrada, a gente inverte
+    // sozinho em vez de descartar a primeira escolha (antes isso fazia parecer
+    // que so um dia ficava marcado).
+    let a = selIn, b = dayISO;
+    if (b < a) { const t = a; a = b; b = t; }
     // valida que nenhuma noite entre inicio e fim esta ocupada
-    if (rangeHasOccupied(selIn, dayISO, pubApt)) {
-      selOut = null;
+    if (rangeHasOccupied(a, b, pubApt)) {
+      selIn = dayISO; selOut = null;
       render();
       const sel = document.getElementById('pubCalSel');
-      if (sel) sel.textContent = 'Esse período tem datas ocupadas no meio. Escolha um intervalo livre.';
+      if (sel) sel.textContent = 'Esse período passa por datas ocupadas — recomecei do dia que você tocou. Agora toque na outra data.';
       return;
     }
-    selOut = dayISO;
+    selIn = a;
+    selOut = b;
     render();
   }
 

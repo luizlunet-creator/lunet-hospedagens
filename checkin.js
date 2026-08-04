@@ -29,8 +29,13 @@
     if (msg) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
+  // O envio usa a navegacao nativa do proprio link <a> (definimos o href e
+  // deixamos o clique seguir): window.open() era bloqueado como popup em
+  // alguns celulares, fazendo o botao "nao funcionar". Link com gesto do
+  // usuario nunca e bloqueado.
   $id('fcEnviar').addEventListener('click', function (e) {
-    e.preventDefault();
+    // sem href, clique invalido nao navega; o href so e definido apos validar
+    this.removeAttribute('href');
     showError('');
 
     const apt = $id('fcApartamento').value;
@@ -69,6 +74,6 @@
 
     const b = (typeof SITE_CONTENT !== 'undefined' && SITE_CONTENT.business) || {};
     const url = `https://wa.me/${b.whatsapp || ''}?text=${encodeURIComponent(linhas.join('\n'))}`;
-    window.open(url, '_blank', 'noopener');
+    this.href = url; // o clique segue o link naturalmente (nunca bloqueado)
   });
 })();

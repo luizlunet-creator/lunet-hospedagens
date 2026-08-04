@@ -987,8 +987,8 @@ select.edit-input option{
 .pub-cal-free:hover{border-color:var(--green-lime); transform:translateY(-1px);}
 .pub-cal-occ{background:rgba(255,90,95,.16); border-color:rgba(255,90,95,.4); color:rgba(244,251,238,.5); text-decoration:line-through; cursor:not-allowed;}
 .pub-cal-past{opacity:.3; cursor:not-allowed;}
-.pub-cal-sel-day{background:rgba(198,255,46,.22); border-color:var(--green-lime);}
-.pub-cal-sel-start, .pub-cal-sel-end{background:var(--green-lime); color:#0b2415;}
+.pub-cal-sel-day{background:rgba(198,255,46,.5); border-color:var(--green-lime); color:#0b2415;}
+.pub-cal-sel-start, .pub-cal-sel-end{background:var(--green-lime); color:#0b2415; box-shadow:0 0 0 2px rgba(198,255,46,.35);}
 .pub-cal-sel{text-align:center; color:var(--muted); font-size:14px; margin:16px 0; min-height:20px;}
 .btn-whatsapp.is-disabled{opacity:.45; pointer-events:none; filter:saturate(.5);}
 
@@ -1009,3 +1009,14 @@ select.edit-input option{
 .checkin-privacy{margin-top:18px;}
 .checkin-error{color:#ff9a9d; font-weight:700; min-height:18px; text-align:center;}
 @media (max-width:480px){ .checkin-grid{grid-template-columns:1fr;} .checkin-card{padding:16px;} }
+
+/* ---------------- Despesas + lucro ---------------- */
+.crm-stat-negative strong{color:#ff9a9d;}
+.crm-stat-negative{border-color:rgba(255,90,95,.5); background:rgba(255,90,95,.08);}
+.desp-row{font-size:13px;}
+.desp-data{color:var(--gold); font-weight:700; min-width:78px;}
+.desp-apt{color:var(--muted);}
+.desp-desc{color:var(--muted); font-style:italic;}
+.desp-valor{font-weight:800; color:var(--white); margin-left:auto;}
+.desp-row .mini-btn{margin:0;}
+.desp-total{text-align:right;}
