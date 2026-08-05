@@ -4,7 +4,7 @@
 // Links dos anuncios no Airbnb — cole aqui assim que tiver os links reais.
 // Enquanto estiverem vazios, o botao "Reservar pelo Airbnb" fica desativado
 // e mostra "Link em atualizacao" no lugar de quebrar ou apontar pra lugar nenhum.
-const AIRBNB_AP05_URL = "";
+const AIRBNB_AP05_URL = "https://www.airbnb.com.br/rooms/1711839118134063258";
 const AIRBNB_AP06_URL = "https://www.airbnb.com.br/rooms/1711835880981110744";
 
 const SITE_CONTENT = {
