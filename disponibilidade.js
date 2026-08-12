@@ -9,6 +9,87 @@
 // aqui. Uma falha ao baixar/ler um calendario NUNCA apaga a disponibilidade
 // anterior — nesse caso o arquivo so' e' deixado como estava.
 window.LUNET_AVAILABILITY = {
-  "generatedAt": "",
-  "blocks": []
+  "generatedAt": "2026-08-12T07:27:42.728Z",
+  "blocks": [
+    {
+      "apt": "airbnb06",
+      "from": "2026-08-10",
+      "to": "2026-08-14"
+    },
+    {
+      "apt": "airbnb06",
+      "from": "2026-08-21",
+      "to": "2026-08-23"
+    },
+    {
+      "apt": "airbnb06",
+      "from": "2026-09-04",
+      "to": "2026-09-06"
+    },
+    {
+      "apt": "airbnb06",
+      "from": "2026-10-10",
+      "to": "2026-10-13"
+    },
+    {
+      "apt": "airbnb06",
+      "from": "2026-11-03",
+      "to": "2026-12-23"
+    },
+    {
+      "apt": "airbnb06",
+      "from": "2026-12-27",
+      "to": "2027-01-31"
+    },
+    {
+      "apt": "airbnb06",
+      "from": "2027-02-01",
+      "to": "2027-03-01"
+    },
+    {
+      "apt": "airbnb5",
+      "from": "2026-08-10",
+      "to": "2026-08-14"
+    },
+    {
+      "apt": "airbnb5",
+      "from": "2026-08-18",
+      "to": "2026-08-20"
+    },
+    {
+      "apt": "airbnb5",
+      "from": "2026-08-22",
+      "to": "2026-08-23"
+    },
+    {
+      "apt": "airbnb5",
+      "from": "2026-08-27",
+      "to": "2026-09-02"
+    },
+    {
+      "apt": "airbnb5",
+      "from": "2026-10-10",
+      "to": "2026-10-13"
+    },
+    {
+      "apt": "airbnb5",
+      "from": "2026-11-01",
+      "to": "2026-12-23"
+    },
+    {
+      "apt": "airbnb5",
+      "from": "2026-12-27",
+      "to": "2027-01-31"
+    },
+    {
+      "apt": "airbnb5",
+      "from": "2027-02-01",
+      "to": "2027-02-14"
+    },
+    {
+      "apt": "airbnb5",
+      "from": "2028-02-01",
+      "to": "2028-02-12"
+    }
+  ]
 };
