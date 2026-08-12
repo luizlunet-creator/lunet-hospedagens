@@ -22,29 +22,63 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          node-version: '24'
 
-      - name: Rodar sincronizacao
+      - name: Sincronizar e publicar (com nova tentativa se o push for rejeitado)
         env:
           AIRBNB_ICS_AP05: ${{ secrets.AIRBNB_ICS_AP05 }}
           BOOKING_ICS_AP05: ${{ secrets.BOOKING_ICS_AP05 }}
           AIRBNB_ICS_AP06: ${{ secrets.AIRBNB_ICS_AP06 }}
           BOOKING_ICS_AP06: ${{ secrets.BOOKING_ICS_AP06 }}
-        run: node scripts/sync-calendars.js disponibilidade.js
-
-      - name: Commit e push (so' se algo mudou de fato)
         run: |
-          if git diff --quiet -- disponibilidade.js; then
-            echo "Nenhuma mudanca em disponibilidade.js — nada a commitar."
-          else
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          MAX_TENTATIVAS=5
+          for tentativa in $(seq 1 "$MAX_TENTATIVAS"); do
+            echo "== Tentativa $tentativa de $MAX_TENTATIVAS =="
+
+            # Roda a sincronizacao sempre contra o disponibilidade.js que
+            # esta no checkout NESTE momento (na 1a tentativa e' o topo do
+            # gh-pages do inicio do job; nas tentativas seguintes, ja e' o
+            # topo mais recente, atualizado abaixo apos um push rejeitado).
+            # A logica de leitura dos ICS e a estrutura de disponibilidade
+            # nao mudam -- so' chamamos o mesmo script de novo.
+            node scripts/sync-calendars.js disponibilidade.js
+
+            if git diff --quiet -- disponibilidade.js; then
+              echo "Nenhuma mudanca em disponibilidade.js — nada a commitar."
+              exit 0
+            fi
+
             git add disponibilidade.js
             git commit -m "Sincroniza disponibilidade automatica (Airbnb/Booking)"
-            git push origin gh-pages
-          fi
+
+            if git push origin HEAD:gh-pages; then
+              echo "Push publicado com sucesso."
+              exit 0
+            fi
+
+            echo "Push rejeitado (branch gh-pages recebeu outro commit durante a execucao)."
+            if [ "$tentativa" -eq "$MAX_TENTATIVAS" ]; then
+              break
+            fi
+            echo "Atualizando com o que ha' de mais recente no remoto e tentando de novo..."
+            git fetch origin gh-pages:refs/remotes/origin/gh-pages
+            # Adota o topo mais recente do remoto (preservando tudo que
+            # chegou la' nesse meio-tempo) e refaz a sincronizacao do zero
+            # em cima dele na proxima volta do loop -- assim nunca
+            # sobrescreve trabalho recente nem perde a disponibilidade
+            # calculada agora, so' recalcula com a base atualizada.
+            git reset --hard origin/gh-pages
+            sleep $(( (RANDOM % 10) + 5 ))
+          done
+
+          echo "::error::Nao foi possivel publicar em gh-pages apos $MAX_TENTATIVAS tentativas (conflito de push persistente)."
+          exit 1
