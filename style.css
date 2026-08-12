@@ -995,6 +995,14 @@ select.edit-input option{
 .pub-cal-sel-day{background:rgba(198,255,46,.5); border-color:var(--green-lime); color:#0b2415;}
 .pub-cal-sel-start, .pub-cal-sel-end{background:var(--green-lime); color:#0b2415; box-shadow:0 0 0 2px rgba(198,255,46,.35);}
 .pub-cal-sel{text-align:center; color:var(--muted); font-size:14px; margin:16px 0; min-height:20px;}
+.pub-cal-sel-row{display:flex; flex-direction:column; align-items:center; gap:2px;}
+.pub-cal-sel-row .pub-cal-sel{margin:16px 0 0;}
+.pub-cal-clear{
+  background:none; border:0; padding:0 0 14px; margin:0;
+  color:var(--muted); font-size:12.5px; text-decoration:underline;
+  cursor:pointer;
+}
+.pub-cal-clear:hover{color:var(--green-lime);}
 .btn-whatsapp.is-disabled{opacity:.45; pointer-events:none; filter:saturate(.5);}
 
 .pub-cal-guests{display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:14px; font-size:13px; color:var(--muted);}

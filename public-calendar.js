@@ -186,6 +186,8 @@
   function updateSelectionUI() {
     const sel = document.getElementById('pubCalSel');
     const btn = document.getElementById('pubCalWhats');
+    const clearBtn = document.getElementById('pubCalClear');
+    if (clearBtn) clearBtn.style.display = selIn ? '' : 'none';
     if (!selIn) {
       if (sel) sel.textContent = 'Toque na data de entrada (check-in) e depois na de saída (check-out).';
       if (btn) { btn.classList.add('is-disabled'); btn.removeAttribute('href'); }
@@ -220,8 +222,28 @@
     }
   }
 
+  function restartAfterOccupied(dayISO) {
+    selIn = dayISO; selOut = null;
+    render();
+    const sel = document.getElementById('pubCalSel');
+    if (sel) sel.textContent = 'Esse período passa por datas ocupadas — recomecei do dia que você tocou. Agora toque na outra data.';
+  }
+
   function onDayClick(dayISO) {
-    // sem inicio, ou intervalo ja fechado -> comeca de novo
+    // Modo 2 (selecao progressiva): ja existe um intervalo completo
+    // (check-in + check-out) e o clique foi numa data POSTERIOR ao checkout
+    // atual -> so estende o checkout ate ali, mantendo o mesmo check-in. E'
+    // o que deixa clicar 1,2,3,4,5 em sequencia virar "1 -> 5" em vez de
+    // reiniciar a reserva a cada clique.
+    if (selIn && selOut && dayISO > selOut) {
+      if (rangeHasOccupied(selIn, dayISO, pubApt)) { restartAfterOccupied(dayISO); return; }
+      selOut = dayISO;
+      render();
+      return;
+    }
+    // qualquer outro clique com o intervalo ja completo (dentro do
+    // intervalo, no proprio check-in/check-out, ou antes do check-in) ->
+    // comeca uma selecao nova (Modo 1). Sem inicio nenhum tambem comeca aqui.
     if (!selIn || (selIn && selOut)) { selIn = dayISO; selOut = null; render(); return; }
     // tocou o mesmo dia de novo -> continua sendo o inicio
     if (dayISO === selIn) { render(); return; }
@@ -232,13 +254,7 @@
     let a = selIn, b = dayISO;
     if (b < a) { const t = a; a = b; b = t; }
     // valida que nenhuma noite entre inicio e fim esta ocupada
-    if (rangeHasOccupied(a, b, pubApt)) {
-      selIn = dayISO; selOut = null;
-      render();
-      const sel = document.getElementById('pubCalSel');
-      if (sel) sel.textContent = 'Esse período passa por datas ocupadas — recomecei do dia que você tocou. Agora toque na outra data.';
-      return;
-    }
+    if (rangeHasOccupied(a, b, pubApt)) { restartAfterOccupied(dayISO); return; }
     selIn = a;
     selOut = b;
     render();
@@ -259,6 +275,8 @@
   if (next) next.addEventListener('click', () => { pubMonth++; if (pubMonth > 11) { pubMonth = 0; pubYear++; } render(); });
   const whats = document.getElementById('pubCalWhats');
   if (whats) whats.addEventListener('click', e => { if (whats.classList.contains('is-disabled')) e.preventDefault(); });
+  const clearBtn = document.getElementById('pubCalClear');
+  if (clearBtn) clearBtn.addEventListener('click', () => { selIn = null; selOut = null; render(); });
 
   renderGuestOptions();
   updateSyncStatus();
