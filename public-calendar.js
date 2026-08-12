@@ -93,7 +93,7 @@
     if (!box) return null;
     if (!selIn || !selOut || typeof calcHospedagem !== 'function') { if (box) box.style.display = 'none'; return null; }
 
-    const calc = calcHospedagem(pubApt, selIn, selOut);
+    const calc = calcHospedagem(pubApt, selIn, selOut, pubGuests);
     if (!calc || !calc.configurado) { box.style.display = 'none'; return null; }
 
     const n = calc.noites.length;
@@ -102,11 +102,42 @@
     document.getElementById('pubCalTripDatas').textContent = `${brDate(selIn)} → ${brDate(selOut)}`;
     document.getElementById('pubCalTripNoitesHospedes').textContent =
       `${n} noite${n === 1 ? '' : 's'} · ${pubGuests} hóspede${pubGuests === 1 ? '' : 's'}`;
+
+    const composicaoRow = document.getElementById('pubCalTripComposicaoRow');
+    if (composicaoRow) composicaoRow.style.display = calc.composicao ? '' : 'none';
+    const composicaoEl = document.getElementById('pubCalTripComposicao');
+    if (composicaoEl) composicaoEl.textContent = calc.composicao || '';
+
     document.getElementById('pubCalTripSubtotal').textContent = formatMoneyPub(calc.subtotal);
+
+    const extraRow = document.getElementById('pubCalTripExtraRow');
+    if (extraRow) extraRow.style.display = calc.extraGuestTotal ? '' : 'none';
+    const extraLabel = document.getElementById('pubCalTripExtraLabel');
+    if (extraLabel) extraLabel.textContent = `Hóspede extra (${calc.hospedesExtra})`;
+    document.getElementById('pubCalTripExtra').textContent = formatMoneyPub(calc.extraGuestTotal);
+
+    const descontoRow = document.getElementById('pubCalTripDescontoRow');
+    if (descontoRow) descontoRow.style.display = calc.descontoValor ? '' : 'none';
+    const descontoLabel = document.getElementById('pubCalTripDescontoLabel');
+    if (descontoLabel && calc.desconto) descontoLabel.textContent = `Desconto estadia longa (${calc.desconto.percent}%)`;
+    document.getElementById('pubCalTripDesconto').textContent = calc.descontoValor ? `− ${formatMoneyPub(calc.descontoValor)}` : '';
+
     const limpezaRow = document.getElementById('pubCalTripLimpezaRow');
     if (limpezaRow) limpezaRow.style.display = calc.cleaningFee ? '' : 'none';
     document.getElementById('pubCalTripLimpeza').textContent = formatMoneyPub(calc.cleaningFee);
     document.getElementById('pubCalTripTotal').textContent = formatMoneyPub(calc.total);
+
+    const minStayWarning = document.getElementById('pubCalTripMinStay');
+    if (minStayWarning) {
+      if (!calc.minStayOk) {
+        minStayWarning.style.display = '';
+        minStayWarning.textContent = `⚠ Esse período exige estadia mínima de ${calc.minStayRequired} noite${calc.minStayRequired === 1 ? '' : 's'} (${PRICING_CATEGORY_LABEL[calc.minStayCategoria]}). Você selecionou ${n}. Escolha um período maior pra continuar.`;
+      } else {
+        minStayWarning.style.display = 'none';
+        minStayWarning.textContent = '';
+      }
+    }
+
     return { n, calc };
   }
 
@@ -126,8 +157,13 @@
       return;
     }
     const n = nights(selIn, selOut);
-    if (sel) sel.textContent = `${APT_LABEL[pubApt]} · ${brDate(selIn)} → ${brDate(selOut)} · ${n} noite${n === 1 ? '' : 's'}. Sujeito a confirmação.`;
     const trip = updateTripBox();
+    if (trip && !trip.calc.minStayOk) {
+      if (sel) sel.textContent = `${APT_LABEL[pubApt]} · ${brDate(selIn)} → ${brDate(selOut)} · ${n} noite${n === 1 ? '' : 's'}.`;
+      if (btn) { btn.classList.add('is-disabled'); btn.removeAttribute('href'); }
+      return;
+    }
+    if (sel) sel.textContent = `${APT_LABEL[pubApt]} · ${brDate(selIn)} → ${brDate(selOut)} · ${n} noite${n === 1 ? '' : 's'}. Sujeito a confirmação.`;
     if (btn) {
       const b = (typeof SITE_CONTENT !== 'undefined' && SITE_CONTENT.business) || {};
       const linhaEstimativa = trip ? `\nEstimativa exibida no site: ${formatMoneyPub(trip.calc.total)}` : '';

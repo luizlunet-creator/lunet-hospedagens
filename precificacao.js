@@ -9,6 +9,10 @@
 // Todos começam em 0 de propósito — enquanto estiverem em 0, o site NÃO
 // mostra a caixa "Sua viagem" pra esse apartamento (pra nunca aparecer
 // R$ 0,00 pro hóspede). Troque os 0 pelos valores reais quando tiver.
+// baseGuests/extraGuestFee = taxa por hóspede extra (opcional). Enquanto
+// extraGuestFee = 0, isso não tem NENHUM efeito no cálculo.
+//   baseGuests    -> nº de hóspedes já incluído na diária
+//   extraGuestFee -> valor por NOITE, por hóspede acima de baseGuests
 const pricing = {
   ap05: {
     normal: 0,        // diária comum (seg a qui)
@@ -16,7 +20,9 @@ const pricing = {
     highSeason: 0,      // diária na alta temporada (ver pricingPeriods.highSeason)
     specialDate: 0,      // diária em feriado/data especial (ver pricingPeriods.specialDates)
     newYear: 0,        // diária no período de Réveillon (ver pricingPeriods.newYear)
-    cleaningFee: 0       // taxa de limpeza (valor fixo, não é por noite)
+    cleaningFee: 0,      // taxa de limpeza (valor fixo, não é por noite)
+    baseGuests: 2,
+    extraGuestFee: 0
   },
   ap06: {
     normal: 0,
@@ -24,7 +30,9 @@ const pricing = {
     highSeason: 0,
     specialDate: 0,
     newYear: 0,
-    cleaningFee: 0
+    cleaningFee: 0,
+    baseGuests: 2,
+    extraGuestFee: 0
   }
 };
 
@@ -49,6 +57,33 @@ const pricingPeriods = {
   specialDates: [
     // "2026-09-07",
     // "2026-10-12",
+  ]
+};
+
+// ---- 3) ESTADIA MÍNIMA (em noites) POR CATEGORIA — edite aqui ----
+// Vale pra reserva inteira: se QUALQUER noite escolhida cair numa categoria
+// com estadia mínima, a reserva toda precisa ter pelo menos esse tanto de
+// noites (ex: 1 noite de Réveillon no meio já exige o mínimo do Réveillon).
+// Quando duas categorias aparecem na mesma reserva, vale o mínimo da que
+// tiver prioridade mais alta (Réveillon > Data especial > Alta temporada >
+// Fim de semana > Normal). Valor 1 = sem restrição (desativado).
+const pricingMinStay = {
+  normal: 1,
+  weekend: 1,
+  highSeason: 1,
+  specialDate: 1,
+  newYear: 1
+};
+
+// ---- 4) DESCONTO POR ESTADIA LONGA (opcional) — edite aqui ----
+// Lista vazia = desativado. Cada item: a partir de quantas noites, quantos
+// % de desconto (aplicado só sobre o valor das diárias, não sobre limpeza
+// nem sobre a taxa de hóspede extra). Se a reserva bater mais de uma regra,
+// vale a de maior "minNights".
+const pricingDiscounts = {
+  longStay: [
+    // { minNights: 7, percent: 5 },
+    // { minNights: 14, percent: 10 },
   ]
 };
 
@@ -84,9 +119,50 @@ function pricingAddDaysISO(iso, n) {
   return `${y}-${m}-${day}`;
 }
 
+// Da categoria de maior prioridade pra menor.
+const PRICING_CATEGORY_PRIORITY = ['newYear', 'specialDate', 'highSeason', 'weekend', 'normal'];
+const PRICING_CATEGORY_LABEL = {
+  normal: 'normal', weekend: 'fim de semana', highSeason: 'alta temporada',
+  specialDate: 'data especial', newYear: 'Réveillon'
+};
+
+// Estadia mínima exigida pra esse conjunto de noites: a categoria de maior
+// prioridade presente manda no mínimo da reserva inteira.
+function pricingMinStayRequired(noites) {
+  const presentes = new Set(noites.map(n => n.categoria));
+  const categoria = PRICING_CATEGORY_PRIORITY.find(c => presentes.has(c)) || 'normal';
+  return { categoria, minNights: Number(pricingMinStay[categoria]) || 1 };
+}
+
+// Desconto de estadia longa que se aplica (o de maior minNights, entre os
+// que a reserva atinge), ou null se nenhum se aplicar / estiver desativado.
+function pricingLongStayDiscount(totalNoites) {
+  const aplicaveis = (pricingDiscounts.longStay || []).filter(d => d && totalNoites >= Number(d.minNights));
+  if (!aplicaveis.length) return null;
+  return aplicaveis.reduce((best, d) => (Number(d.minNights) > Number(best.minNights) ? d : best));
+}
+
+// Texto tipo "1 noite normal + 2 noites fim de semana" — só quando a
+// reserva mistura mais de uma categoria (senão devolve null, pra não
+// poluir a caixa "Sua viagem" com uma obviedade).
+function pricingComposicaoNoites(noites) {
+  const counts = {};
+  const ordem = [];
+  noites.forEach(n => {
+    if (!(n.categoria in counts)) ordem.push(n.categoria);
+    counts[n.categoria] = (counts[n.categoria] || 0) + 1;
+  });
+  if (ordem.length <= 1) return null;
+  return ordem.map(cat => `${counts[cat]} noite${counts[cat] === 1 ? '' : 's'} ${PRICING_CATEGORY_LABEL[cat]}`).join(' + ');
+}
+
+// Arredonda pra centavo (evita erro de ponto flutuante tipo 129.99999999).
+function pricingRound2(v) { return Math.round((Number(v) || 0) * 100) / 100; }
+
 // Calcula noite por noite (uma reserva pode atravessar categorias
-// diferentes) e devolve o detalhamento completo.
-function calcHospedagem(aptId, checkinISO, checkoutISO) {
+// diferentes) e devolve o detalhamento completo: preço, hóspede extra,
+// desconto de estadia longa e a checagem de estadia mínima.
+function calcHospedagem(aptId, checkinISO, checkoutISO, guestsCount) {
   const key = PRICING_APT_KEY[aptId];
   const cfg = key && pricing[key];
   if (!cfg) return null;
@@ -99,14 +175,35 @@ function calcHospedagem(aptId, checkinISO, checkoutISO) {
     noites.push({ data: cursor, categoria, preco });
     cursor = pricingAddDaysISO(cursor, 1);
   }
+  const totalNoites = noites.length;
 
   const subtotal = noites.reduce((s, n) => s + n.preco, 0);
   const cleaningFee = Number(cfg.cleaningFee) || 0;
+
+  const baseGuests = Number(cfg.baseGuests) || 2;
+  const extraGuestFee = Number(cfg.extraGuestFee) || 0;
+  const hospedesExtra = Math.max(0, (Number(guestsCount) || 0) - baseGuests);
+  const extraGuestTotal = pricingRound2(hospedesExtra * extraGuestFee * totalNoites);
+
+  const desconto = pricingLongStayDiscount(totalNoites);
+  const descontoValor = desconto ? pricingRound2(subtotal * desconto.percent / 100) : 0;
+
+  const minStay = pricingMinStayRequired(noites);
 
   // Se a diária normal não foi configurada (ainda em 0), consideramos que
   // o apartamento não tem preço publicado ainda — não mostra estimativa
   // pra não exibir R$ 0,00 (ou uma conta zerada) pro hóspede.
   const configurado = Number(cfg.normal) > 0;
 
-  return { noites, subtotal, cleaningFee, total: subtotal + cleaningFee, configurado };
+  const total = pricingRound2(subtotal - descontoValor + cleaningFee + extraGuestTotal);
+
+  return {
+    noites, subtotal, cleaningFee, total, configurado,
+    composicao: pricingComposicaoNoites(noites),
+    baseGuests, hospedesExtra, extraGuestFee, extraGuestTotal,
+    desconto, descontoValor,
+    minStayCategoria: minStay.categoria,
+    minStayRequired: minStay.minNights,
+    minStayOk: totalNoites >= minStay.minNights
+  };
 }
