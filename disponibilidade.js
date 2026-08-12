@@ -1,12 +1,14 @@
-// Disponibilidade pública do site — SOMENTE datas ocupadas (sem nome de
-// hóspede, sem valor, sem plataforma). É a mesma informação de disponibilidade
-// que o Airbnb/Booking já mostram publicamente.
+// Disponibilidade publica do site — SOMENTE apartamento + periodo
+// ocupado (sem nome de hospede, telefone, e-mail, numero de reserva, valor
+// ou plataforma de origem). E' a mesma informacao que o Airbnb/Booking ja
+// mostram publicamente nos calendarios deles.
 //
-// Este arquivo é gerado pelo CRM (botão "Exportar disponibilidade para o site")
-// e atualizado manualmente — por isso as datas no site ficam "sujeitas a
-// confirmação". Enquanto estiver vazio, o site mostra todas as datas futuras
-// como livres e o hóspede confirma pelo WhatsApp.
+// Este arquivo e' gerado automaticamente pela GitHub Action
+// ".github/workflows/sync-calendars.yml" (scripts/sync-calendars.js), que le
+// os calendarios iCal do Airbnb e do Booking a cada 30 minutos e faz o merge
+// aqui. Uma falha ao baixar/ler um calendario NUNCA apaga a disponibilidade
+// anterior — nesse caso o arquivo so' e' deixado como estava.
 window.LUNET_AVAILABILITY = {
-  generatedAt: "",
-  blocks: []
+  "generatedAt": "",
+  "blocks": []
 };

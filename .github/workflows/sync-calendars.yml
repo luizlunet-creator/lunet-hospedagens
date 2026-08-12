@@ -1,0 +1,50 @@
+name: Sincronizar disponibilidade (Airbnb/Booking)
+
+# Este workflow mora no branch gh-pages (o unico branch publicado no
+# GitHub) porque o branch padrao do repositorio e' o gh-pages — o master
+# e' privado e nunca foi publicado. scripts/sync-calendars.js e' publico e
+# nao contem nenhum segredo, so' o codigo que le os 4 Secrets abaixo.
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-calendars
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Rodar sincronizacao
+        env:
+          AIRBNB_ICS_AP05: ${{ secrets.AIRBNB_ICS_AP05 }}
+          BOOKING_ICS_AP05: ${{ secrets.BOOKING_ICS_AP05 }}
+          AIRBNB_ICS_AP06: ${{ secrets.AIRBNB_ICS_AP06 }}
+          BOOKING_ICS_AP06: ${{ secrets.BOOKING_ICS_AP06 }}
+        run: node scripts/sync-calendars.js disponibilidade.js
+
+      - name: Commit e push (so' se algo mudou de fato)
+        run: |
+          if git diff --quiet -- disponibilidade.js; then
+            echo "Nenhuma mudanca em disponibilidade.js — nada a commitar."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add disponibilidade.js
+            git commit -m "Sincroniza disponibilidade automatica (Airbnb/Booking)"
+            git push origin gh-pages
+          fi

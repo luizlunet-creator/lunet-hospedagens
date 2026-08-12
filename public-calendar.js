@@ -11,6 +11,8 @@
   const grid = document.getElementById('pubCalGrid');
   if (!grid) return; // secao nao existe nesta pagina
 
+  const STALE_HOURS = 6; // acima disso, mostramos o aviso extra de "sujeito a confirmacao pelo WhatsApp"
+
   const now = new Date();
   let pubYear = now.getFullYear();
   let pubMonth = now.getMonth();
@@ -33,6 +35,46 @@
     if (pubGuests > max) pubGuests = max;
     sel.innerHTML = Array.from({ length: max }, (_, i) => i + 1)
       .map(n => `<option value="${n}" ${n === pubGuests ? 'selected' : ''}>${n} hóspede${n === 1 ? '' : 's'}</option>`).join('');
+  }
+
+  // Formata um ISO (UTC, gerado pela sincronizacao automatica) como
+  // "DD/MM/AAAA às HH:MM" no horario de Brasilia, pra mostrar perto do
+  // calendario quando foi a ultima vez que a disponibilidade foi atualizada.
+  function formatSyncDateTime(iso) {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    const parts = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false
+    }).formatToParts(d).reduce((acc, p) => { acc[p.type] = p.value; return acc; }, {});
+    return `${parts.day}/${parts.month}/${parts.year} às ${parts.hour}:${parts.minute}`;
+  }
+
+  // Mostra perto do calendario quando a disponibilidade foi sincronizada pela
+  // ultima vez (ou avisa que ainda nao houve sincronizacao valida), e troca o
+  // rotulo "Livre" da legenda por "Disponível para consulta" enquanto nao
+  // houver sincronizacao — pra nunca afirmar categoricamente que uma data
+  // esta livre sem ter vindo de uma fonte automatica confirmada.
+  function updateSyncStatus() {
+    const el = document.getElementById('pubCalSyncStatus');
+    const legendFree = document.getElementById('pubCalLegendFree');
+    const av = window.LUNET_AVAILABILITY || {};
+    const generatedAt = av.generatedAt || '';
+
+    if (legendFree) legendFree.textContent = generatedAt ? 'Livre' : 'Disponível para consulta';
+    if (!el) return;
+
+    if (!generatedAt) {
+      el.textContent = 'Disponibilidade sujeita a confirmação.';
+      el.classList.add('is-stale');
+      return;
+    }
+    const ts = new Date(generatedAt).getTime();
+    const staleMs = STALE_HOURS * 60 * 60 * 1000;
+    const isStale = isNaN(ts) || (Date.now() - ts) > staleMs;
+    let texto = `Disponibilidade atualizada em: ${formatSyncDateTime(generatedAt)}`;
+    if (isStale) texto += ' — Disponibilidade sujeita a confirmação pelo WhatsApp.';
+    el.textContent = texto;
+    el.classList.toggle('is-stale', isStale);
   }
 
   function isoOf(y, m, d) { return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`; }
@@ -219,5 +261,6 @@
   if (whats) whats.addEventListener('click', e => { if (whats.classList.contains('is-disabled')) e.preventDefault(); });
 
   renderGuestOptions();
+  updateSyncStatus();
   render();
 })();

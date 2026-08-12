@@ -1015,6 +1015,9 @@ select.edit-input option{
   background:rgba(255,90,95,.12); border:1px solid rgba(255,90,95,.4); color:#ff9a9d;
 }
 
+.pub-cal-sync-status{text-align:center; color:var(--muted); font-size:12px; margin:-6px 0 14px;}
+.pub-cal-sync-status.is-stale{color:#ffb02e;}
+
 @media (max-width:560px){
   .pub-cal-cell{font-size:12px; border-radius:8px;}
   .pub-cal-head strong{font-size:16px; min-width:120px;}
