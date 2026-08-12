@@ -91,27 +91,23 @@
   function updateTripBox() {
     const box = document.getElementById('pubCalTrip');
     if (!box) return null;
-    if (!selIn || !selOut) { box.style.display = 'none'; return null; }
+    if (!selIn || !selOut || typeof calcHospedagem !== 'function') { if (box) box.style.display = 'none'; return null; }
 
-    const n = nights(selIn, selOut);
-    const listing = currentListing();
-    const diaria = Number(listing.diariaBase) || 0;
-    const limpeza = Number(listing.taxaLimpeza) || 0;
-    const subtotal = diaria * n;
-    const total = subtotal + limpeza;
+    const calc = calcHospedagem(pubApt, selIn, selOut);
+    if (!calc || !calc.configurado) { box.style.display = 'none'; return null; }
 
-    box.style.display = diaria ? '' : 'none';
-    if (!diaria) return null;
-
+    const n = calc.noites.length;
+    box.style.display = '';
+    document.getElementById('pubCalTripApt').textContent = APT_LABEL[pubApt];
     document.getElementById('pubCalTripDatas').textContent = `${brDate(selIn)} → ${brDate(selOut)}`;
-    document.getElementById('pubCalTripNoites').textContent = `${n} noite${n === 1 ? '' : 's'}`;
-    document.getElementById('pubCalTripHospedes').textContent = `${pubGuests} hóspede${pubGuests === 1 ? '' : 's'}`;
-    document.getElementById('pubCalTripSubtotal').textContent = `${n} noite${n === 1 ? '' : 's'} × ${formatMoneyPub(diaria)} = ${formatMoneyPub(subtotal)}`;
+    document.getElementById('pubCalTripNoitesHospedes').textContent =
+      `${n} noite${n === 1 ? '' : 's'} · ${pubGuests} hóspede${pubGuests === 1 ? '' : 's'}`;
+    document.getElementById('pubCalTripSubtotal').textContent = formatMoneyPub(calc.subtotal);
     const limpezaRow = document.getElementById('pubCalTripLimpezaRow');
-    if (limpezaRow) limpezaRow.style.display = limpeza ? '' : 'none';
-    document.getElementById('pubCalTripLimpeza').textContent = formatMoneyPub(limpeza);
-    document.getElementById('pubCalTripTotal').textContent = formatMoneyPub(total);
-    return { n, diaria, limpeza, subtotal, total };
+    if (limpezaRow) limpezaRow.style.display = calc.cleaningFee ? '' : 'none';
+    document.getElementById('pubCalTripLimpeza').textContent = formatMoneyPub(calc.cleaningFee);
+    document.getElementById('pubCalTripTotal').textContent = formatMoneyPub(calc.total);
+    return { n, calc };
   }
 
   function updateSelectionUI() {
@@ -134,9 +130,13 @@
     const trip = updateTripBox();
     if (btn) {
       const b = (typeof SITE_CONTENT !== 'undefined' && SITE_CONTENT.business) || {};
-      const brand = b.brand || 'Prédio Lunet';
-      const estimativa = trip ? ` O site mostrou uma estimativa de ${formatMoneyPub(trip.total)}.` : '';
-      const msg = `Olá! Gostaria de reservar o ${APT_LABEL[pubApt]} do ${brand} de ${brDate(selIn)} a ${brDate(selOut)} (${n} noite${n === 1 ? '' : 's'}) para ${pubGuests} hóspede${pubGuests === 1 ? '' : 's'}.${estimativa} Essas datas estão disponíveis?`;
+      const linhaEstimativa = trip ? `\nEstimativa exibida no site: ${formatMoneyPub(trip.calc.total)}` : '';
+      const msg = `Olá! Gostaria de consultar a disponibilidade do ${APT_LABEL[pubApt]}.\n\n` +
+        `Entrada: ${brDate(selIn)}\n` +
+        `Saída: ${brDate(selOut)}\n` +
+        `Hóspedes: ${pubGuests}\n` +
+        `Noites: ${n}${linhaEstimativa}\n\n` +
+        `Gostaria de confirmar a disponibilidade e o valor final.`;
       btn.href = `https://wa.me/${b.whatsapp || ''}?text=${encodeURIComponent(msg)}`;
       btn.classList.remove('is-disabled');
     }

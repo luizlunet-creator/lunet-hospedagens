@@ -1003,6 +1003,7 @@ select.edit-input option{
   border:1px solid rgba(198,255,46,.25); border-radius:var(--radius); padding:18px 20px;
 }
 .pub-cal-trip-title{font-weight:900; color:var(--green-lime); text-transform:uppercase; font-size:13px; letter-spacing:.5px; margin:0 0 10px;}
+.pub-cal-trip-apt span{font-weight:900; color:var(--gold); font-size:16px;}
 .pub-cal-trip-row{display:flex; justify-content:space-between; gap:10px; font-size:14px; color:var(--white); padding:3px 0;}
 .pub-cal-trip-sub{color:var(--muted); font-size:12.5px;}
 .pub-cal-trip-divider{height:1px; background:rgba(244,251,238,.1); margin:10px 0;}
