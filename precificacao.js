@@ -119,19 +119,26 @@ function pricingAddDaysISO(iso, n) {
   return `${y}-${m}-${day}`;
 }
 
-// Da categoria de maior prioridade pra menor.
-const PRICING_CATEGORY_PRIORITY = ['newYear', 'specialDate', 'highSeason', 'weekend', 'normal'];
 const PRICING_CATEGORY_LABEL = {
   normal: 'normal', weekend: 'fim de semana', highSeason: 'alta temporada',
   specialDate: 'data especial', newYear: 'Réveillon'
 };
 
-// Estadia mínima exigida pra esse conjunto de noites: a categoria de maior
-// prioridade presente manda no mínimo da reserva inteira.
+// Estadia mínima exigida pra esse conjunto de noites: entre TODAS as
+// categorias presentes na reserva, vale o MAIOR mínimo de noites — não a
+// categoria de maior prioridade de preço (uma reserva pode misturar uma
+// categoria "forte" no preço com mínimo baixo e uma categoria "fraca" com
+// mínimo mais alto; nesse caso o mínimo mais alto e' quem manda).
 function pricingMinStayRequired(noites) {
-  const presentes = new Set(noites.map(n => n.categoria));
-  const categoria = PRICING_CATEGORY_PRIORITY.find(c => presentes.has(c)) || 'normal';
-  return { categoria, minNights: Number(pricingMinStay[categoria]) || 1 };
+  const presentes = Array.from(new Set(noites.map(n => n.categoria)));
+  if (!presentes.length) return { categoria: 'normal', minNights: 1 };
+  let categoria = presentes[0];
+  let minNights = Number(pricingMinStay[categoria]) || 1;
+  presentes.forEach(cat => {
+    const min = Number(pricingMinStay[cat]) || 1;
+    if (min > minNights) { minNights = min; categoria = cat; }
+  });
+  return { categoria, minNights };
 }
 
 // Desconto de estadia longa que se aplica (o de maior minNights, entre os
@@ -159,6 +166,18 @@ function pricingComposicaoNoites(noites) {
 // Arredonda pra centavo (evita erro de ponto flutuante tipo 129.99999999).
 function pricingRound2(v) { return Math.round((Number(v) || 0) * 100) / 100; }
 
+// Preco da noite pra uma categoria: se weekend/highSeason/specialDate/newYear
+// estiver em 0, vazio ou invalido, cai pro valor da diaria normal do mesmo
+// apartamento. Nunca cobra (nem mostra) uma noite a R$ 0 enquanto a diaria
+// normal estiver configurada -- categorias especiais sao um AJUSTE sobre a
+// normal, nao um valor obrigatorio de preencher.
+function pricingNightRate(cfg, categoria) {
+  const normal = Number(cfg.normal) || 0;
+  if (categoria === 'normal') return normal;
+  const raw = Number(cfg[categoria]);
+  return Number.isFinite(raw) && raw > 0 ? raw : normal;
+}
+
 // Calcula noite por noite (uma reserva pode atravessar categorias
 // diferentes) e devolve o detalhamento completo: preço, hóspede extra,
 // desconto de estadia longa e a checagem de estadia mínima.
@@ -171,7 +190,7 @@ function calcHospedagem(aptId, checkinISO, checkoutISO, guestsCount) {
   let cursor = checkinISO;
   while (cursor < checkoutISO) {
     const categoria = pricingCategoryForNight(cursor);
-    const preco = Number(cfg[categoria]) || 0;
+    const preco = pricingNightRate(cfg, categoria);
     noites.push({ data: cursor, categoria, preco });
     cursor = pricingAddDaysISO(cursor, 1);
   }
