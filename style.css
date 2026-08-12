@@ -518,6 +518,11 @@ img{max-width:100%;display:block;}
 .detail-amenities li::before{
   content:"✓"; position:absolute; left:0; color:var(--green-lime); font-weight:900;
 }
+.video-tour-section{padding:18px 26px 0;}
+.video-tour-title{margin:0 0 3px; font-size:16px; font-weight:800; color:var(--white);}
+.video-tour-subtitle{margin:0 0 12px; font-size:13px; color:var(--muted);}
+.video-tour-player{background:#000;}
+
 .detail-videos{display:flex; flex-direction:column; gap:14px; margin:0 0 20px;}
 .detail-video-wrap{
   position:relative; width:100%; aspect-ratio:16/9;

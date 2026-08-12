@@ -364,6 +364,46 @@ function avisoVideoHtml(listing) {
   return `<div class="detail-aviso-box"><p class="detail-aviso-label">⚠ Aviso importante</p>${embed}</div>`;
 }
 
+// Video-tour proprio do apartamento (.mp4 hospedado aqui, com capa/poster).
+// So carrega/toca o video quando o hospede clica -- antes disso e' so uma
+// imagem (nem o preload="metadata" chega a rodar antes do clique). Some da
+// ficha se o apartamento nao tiver "videoTour.src" configurado.
+function videoTourHtml(listing) {
+  const vt = listing.videoTour;
+  if (!vt || !vt.src) return '';
+  return `
+    <div class="video-tour-section">
+      <h3 class="video-tour-title">${vt.title || `Conheça o ${listing.title} em vídeo`}</h3>
+      ${vt.subtitle ? `<p class="video-tour-subtitle">${vt.subtitle}</p>` : ''}
+      <div class="video-tour" data-video-tour="${listing.id}">
+        <button type="button" class="video-cover" data-play-video-tour="${listing.id}" aria-label="Assistir ao vídeo do tour do ${listing.title}">
+          ${vt.poster ? `<img src="${vt.poster}" alt="Capa do vídeo — tour do ${listing.title}" loading="lazy">` : ''}
+          <span class="video-play-btn">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </span>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function playVideoTour(listingId) {
+  const l = getListing(listingId);
+  const wrap = $(`.video-tour[data-video-tour="${listingId}"]`);
+  const vt = l && l.videoTour;
+  if (!wrap || !vt || !vt.src) return;
+  wrap.innerHTML = `
+    <div class="detail-video-wrap">
+      <video class="video-tour-player" controls preload="metadata" ${vt.poster ? `poster="${vt.poster}"` : ''} playsinline>
+        <source src="${vt.src}" type="video/mp4">
+        Seu navegador não suporta a reprodução de vídeo.
+      </video>
+    </div>
+  `;
+  const video = wrap.querySelector('video');
+  if (video) video.play().catch(() => {});
+}
+
 /* ---------------- Seção de vídeo por apartamento (home) ---------------- */
 
 function renderVideoSection() {
@@ -412,6 +452,7 @@ function openListingDetail(id) {
       ${detailCarouselHtml(l)}
       ${ratingBadgeHtml(l)}
     </div>
+    ${videoTourHtml(l)}
     <div class="detail-info">
       ${apartmentBadgeHtml(l)}
       <h2>${l.title}</h2>
@@ -432,6 +473,9 @@ function openListingDetail(id) {
   `;
   setupDetailCarousel();
   wireZoomables($('#detailBody'), l);
+  $$('[data-play-video-tour]', $('#detailBody')).forEach(btn => {
+    btn.addEventListener('click', () => playVideoTour(btn.dataset.playVideoTour));
+  });
   $('#detailOverlay').dataset.active = 'true';
   document.body.style.overflow = 'hidden';
 }

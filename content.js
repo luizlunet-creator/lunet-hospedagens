@@ -72,6 +72,15 @@ const SITE_CONTENT = {
       ],
       videos: [],
       avisoVideo: null,
+      // Video-tour proprio do apartamento (arquivo .mp4 hospedado aqui no
+      // site, nao Instagram/YouTube). So aparece na ficha do apartamento se
+      // "src" estiver preenchido -- deixe null pra esconder o bloco.
+      videoTour: {
+        src: "assets/listings/airbnb06/AP06_video_site_otimizado.mp4",
+        poster: "assets/listings/airbnb06/AP06_video_thumb.jpg",
+        title: "Conheça o AP 06 em vídeo",
+        subtitle: "Veja um tour rápido pelo apartamento."
+      },
       airbnbUrl: AIRBNB_AP06_URL
     },
     {
@@ -107,6 +116,19 @@ const SITE_CONTENT = {
       ],
       videos: [],
       avisoVideo: null,
+      // Video-tour proprio do apartamento (arquivo .mp4 hospedado aqui no
+      // site, nao Instagram/YouTube). So aparece na ficha do apartamento se
+      // "src" estiver preenchido -- deixe null pra esconder o bloco.
+      // poster: o arquivo AP05_video_thumb.jpg (a capa definitiva) ainda nao
+      // foi enviado -- usando por enquanto a primeira foto da galeria como
+      // capa temporaria. Troque pra "assets/listings/airbnb5/AP05_video_thumb.jpg"
+      // assim que o arquivo chegar.
+      videoTour: {
+        src: "assets/listings/airbnb5/AP05_video_site_otimizado.mp4",
+        poster: "assets/listings/airbnb5/cozinha-pdf.jpg",
+        title: "Conheça o AP 05 em vídeo",
+        subtitle: "Veja um tour rápido pelo apartamento."
+      },
       airbnbUrl: AIRBNB_AP05_URL
     }
   ],
