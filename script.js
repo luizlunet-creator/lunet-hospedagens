@@ -131,6 +131,8 @@ function renderBusinessUI() {
   $('#navWhatsapp').href = waLink(b.whatsapp, msg);
   $('#contactWhatsapp').href = waLink(b.whatsapp, msg);
   $('#contactInstagram').href = b.instagram || '#';
+  const stickyWhats = $('#stickyBookWhats');
+  if (stickyWhats) stickyWhats.href = waLink(b.whatsapp, msg);
 
   const groupMsg = `Olá! Estamos em grupo e gostaria de saber sobre reservar as duas unidades (AP 05 e AP 06) do ${b.brand}, conforme disponibilidade.`;
   const groupBtn = $('#groupWhatsapp');
@@ -141,16 +143,36 @@ function renderBusinessUI() {
   renderFooter(b);
 }
 
+// Mapa proprio (OpenStreetMap + Leaflet, sem chave de API) no lugar do embed
+// do Google, que costumava falhar em navegadores internos (WhatsApp/Instagram)
+// no celular. As coordenadas ficam em SITE_CONTENT.mapPoints.
 function renderMapsSection(b) {
-  const wrap = $('#mapsEmbedWrap');
-  if (!wrap) return;
+  const el = $('#lunetMap');
+  if (!el) return;
   const query = encodeURIComponent(b.address || b.city || '');
-  const embedSrc = (b.mapsEmbedUrl && b.mapsEmbedUrl.trim()) || `https://www.google.com/maps?q=${query}&output=embed`;
-  wrap.innerHTML = `<iframe src="${embedSrc}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen title="Mapa — ${b.brand}"></iframe>`;
   $('#mapsAddressText').textContent = b.address || '';
   const dirUrl = `https://www.google.com/maps/dir/?api=1&destination=${query}`;
   $('#mapsDirections').href = dirUrl;
   $('#mapsAppLink').href = `https://www.google.com/maps/search/?api=1&query=${query}`;
+
+  const points = SITE_CONTENT.mapPoints || [];
+  if (typeof L === 'undefined' || !points.length) return;
+
+  const home = points.find(p => p.kind === 'home') || points[0];
+  const map = L.map(el, { scrollWheelZoom: false }).setView([home.lat, home.lng], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19
+  }).addTo(map);
+
+  const homeIcon = L.divIcon({ className: '', html: '<div class="map-pin-home"></div>', iconSize: [16, 16], iconAnchor: [8, 14] });
+  const poiIcon = L.divIcon({ className: '', html: '<div class="map-pin-poi"></div>', iconSize: [12, 12], iconAnchor: [6, 10] });
+
+  points.forEach(p => {
+    const icon = p.kind === 'home' ? homeIcon : poiIcon;
+    L.marker([p.lat, p.lng], { icon }).addTo(map)
+      .bindPopup(`<strong>${p.name}</strong>${p.blurb ? `<br>${p.blurb}` : ''}`);
+  });
 }
 
 function footerInfoLinkHtml(key, label, text) {

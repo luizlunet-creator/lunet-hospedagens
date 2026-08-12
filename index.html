@@ -11,6 +11,7 @@
 <meta property="og:url" content="https://luizlunet-creator.github.io/predio-lunet-site/">
 <meta property="og:type" content="website">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 </head>
 <body>
 
@@ -67,6 +68,10 @@
         <button type="button" class="btn-ghost btn-sm" data-pub-apt="airbnb06">AP 06</button>
         <button type="button" class="btn-ghost btn-sm" data-pub-apt="airbnb5">AP 05</button>
       </div>
+      <div class="pub-cal-guests">
+        <label for="pubCalGuests">Hóspedes</label>
+        <select class="pub-cal-guests-select" id="pubCalGuests"></select>
+      </div>
       <div class="pub-cal-head">
         <button type="button" class="btn-ghost btn-sm" id="pubCalPrev" aria-label="Mês anterior">‹</button>
         <strong id="pubCalTitle"></strong>
@@ -79,8 +84,23 @@
       </div>
       <div class="pub-cal-grid" id="pubCalGrid"></div>
       <p class="pub-cal-sel" id="pubCalSel"></p>
+
+      <div class="pub-cal-trip" id="pubCalTrip" style="display:none;">
+        <p class="pub-cal-trip-title">Sua viagem</p>
+        <div class="pub-cal-trip-row"><span id="pubCalTripDatas"></span></div>
+        <div class="pub-cal-trip-row pub-cal-trip-sub">
+          <span id="pubCalTripNoites"></span>
+          <span id="pubCalTripHospedes"></span>
+        </div>
+        <div class="pub-cal-trip-divider"></div>
+        <div class="pub-cal-trip-row"><span>Hospedagem</span><span id="pubCalTripSubtotal"></span></div>
+        <div class="pub-cal-trip-row" id="pubCalTripLimpezaRow"><span>Limpeza</span><span id="pubCalTripLimpeza"></span></div>
+        <div class="pub-cal-trip-row pub-cal-trip-total"><span>Estimativa</span><span id="pubCalTripTotal"></span></div>
+        <p class="note pub-cal-trip-note">Valor estimado, sujeito a confirmação. O valor final é combinado pelo WhatsApp.</p>
+      </div>
+
       <div class="hero-actions">
-        <a class="btn-whatsapp is-disabled" id="pubCalWhats" target="_blank" rel="noopener">Pedir reserva pelo WhatsApp</a>
+        <a class="btn-whatsapp is-disabled" id="pubCalWhats" target="_blank" rel="noopener">Consultar disponibilidade no WhatsApp</a>
       </div>
     </div>
   </section>
@@ -127,7 +147,7 @@
       <p class="eyebrow">Como chegar</p>
       <h2>Localização estratégica em Itajaí</h2>
       <p class="section-lead" id="mapsAddressText"></p>
-      <div class="maps-embed-wrap" id="mapsEmbedWrap"></div>
+      <div class="lunet-map" id="lunetMap"></div>
       <div class="hero-actions">
         <a class="btn-whatsapp" id="mapsDirections" href="#" target="_blank" rel="noopener">Como chegar</a>
         <a class="btn-ghost" id="mapsAppLink" href="#" target="_blank" rel="noopener">Abrir no Google Maps</a>
@@ -138,6 +158,11 @@
 </main>
 
 <footer class="site-footer" id="siteFooter"></footer>
+
+<div class="sticky-book-bar" id="stickyBookBar">
+  <a class="btn-ghost" href="#disponibilidade" id="stickyBookDatas">Ver datas</a>
+  <a class="btn-whatsapp" id="stickyBookWhats" target="_blank" rel="noopener">WhatsApp</a>
+</div>
 
 <!-- Regras / Privacidade -->
 <div class="lightbox footer-info-modal" id="footerInfoModal" data-active="false">
@@ -167,6 +192,7 @@
 
 <script src="content.js"></script>
 <script src="disponibilidade.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="script.js"></script>
 <script src="public-calendar.js"></script>
 </body>

@@ -17,6 +17,23 @@
   let pubApt = 'airbnb06';
   let selIn = null;
   let selOut = null;
+  let pubGuests = 2;
+
+  function currentListing() {
+    const list = (typeof SITE_CONTENT !== 'undefined' && SITE_CONTENT.listings) || [];
+    return list.find(l => l.id === pubApt) || {};
+  }
+  function formatMoneyPub(v) {
+    return 'R$ ' + (Number(v) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function renderGuestOptions() {
+    const sel = document.getElementById('pubCalGuests');
+    if (!sel) return;
+    const max = currentListing().guests || 6;
+    if (pubGuests > max) pubGuests = max;
+    sel.innerHTML = Array.from({ length: max }, (_, i) => i + 1)
+      .map(n => `<option value="${n}" ${n === pubGuests ? 'selected' : ''}>${n} hóspede${n === 1 ? '' : 's'}</option>`).join('');
+  }
 
   function isoOf(y, m, d) { return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`; }
   function todayISO() { return isoOf(now.getFullYear(), now.getMonth(), now.getDate()); }
@@ -71,25 +88,55 @@
     updateSelectionUI();
   }
 
+  function updateTripBox() {
+    const box = document.getElementById('pubCalTrip');
+    if (!box) return null;
+    if (!selIn || !selOut) { box.style.display = 'none'; return null; }
+
+    const n = nights(selIn, selOut);
+    const listing = currentListing();
+    const diaria = Number(listing.diariaBase) || 0;
+    const limpeza = Number(listing.taxaLimpeza) || 0;
+    const subtotal = diaria * n;
+    const total = subtotal + limpeza;
+
+    box.style.display = diaria ? '' : 'none';
+    if (!diaria) return null;
+
+    document.getElementById('pubCalTripDatas').textContent = `${brDate(selIn)} → ${brDate(selOut)}`;
+    document.getElementById('pubCalTripNoites').textContent = `${n} noite${n === 1 ? '' : 's'}`;
+    document.getElementById('pubCalTripHospedes').textContent = `${pubGuests} hóspede${pubGuests === 1 ? '' : 's'}`;
+    document.getElementById('pubCalTripSubtotal').textContent = `${n} noite${n === 1 ? '' : 's'} × ${formatMoneyPub(diaria)} = ${formatMoneyPub(subtotal)}`;
+    const limpezaRow = document.getElementById('pubCalTripLimpezaRow');
+    if (limpezaRow) limpezaRow.style.display = limpeza ? '' : 'none';
+    document.getElementById('pubCalTripLimpeza').textContent = formatMoneyPub(limpeza);
+    document.getElementById('pubCalTripTotal').textContent = formatMoneyPub(total);
+    return { n, diaria, limpeza, subtotal, total };
+  }
+
   function updateSelectionUI() {
     const sel = document.getElementById('pubCalSel');
     const btn = document.getElementById('pubCalWhats');
     if (!selIn) {
       if (sel) sel.textContent = 'Toque na data de entrada (check-in) e depois na de saída (check-out).';
       if (btn) { btn.classList.add('is-disabled'); btn.removeAttribute('href'); }
+      updateTripBox();
       return;
     }
     if (selIn && !selOut) {
       if (sel) sel.textContent = `Entrada: ${brDate(selIn)}. Agora toque na data de saída.`;
       if (btn) { btn.classList.add('is-disabled'); btn.removeAttribute('href'); }
+      updateTripBox();
       return;
     }
     const n = nights(selIn, selOut);
     if (sel) sel.textContent = `${APT_LABEL[pubApt]} · ${brDate(selIn)} → ${brDate(selOut)} · ${n} noite${n === 1 ? '' : 's'}. Sujeito a confirmação.`;
+    const trip = updateTripBox();
     if (btn) {
       const b = (typeof SITE_CONTENT !== 'undefined' && SITE_CONTENT.business) || {};
       const brand = b.brand || 'Prédio Lunet';
-      const msg = `Olá! Gostaria de reservar o ${APT_LABEL[pubApt]} do ${brand} de ${brDate(selIn)} a ${brDate(selOut)} (${n} noite${n === 1 ? '' : 's'}). Essas datas estão disponíveis?`;
+      const estimativa = trip ? ` O site mostrou uma estimativa de ${formatMoneyPub(trip.total)}.` : '';
+      const msg = `Olá! Gostaria de reservar o ${APT_LABEL[pubApt]} do ${brand} de ${brDate(selIn)} a ${brDate(selOut)} (${n} noite${n === 1 ? '' : 's'}) para ${pubGuests} hóspede${pubGuests === 1 ? '' : 's'}.${estimativa} Essas datas estão disponíveis?`;
       btn.href = `https://wa.me/${b.whatsapp || ''}?text=${encodeURIComponent(msg)}`;
       btn.classList.remove('is-disabled');
     }
@@ -124,8 +171,10 @@
     if (cell) onDayClick(cell.dataset.day);
   });
   document.querySelectorAll('[data-pub-apt]').forEach(b =>
-    b.addEventListener('click', () => { pubApt = b.dataset.pubApt; selIn = selOut = null; render(); })
+    b.addEventListener('click', () => { pubApt = b.dataset.pubApt; selIn = selOut = null; renderGuestOptions(); render(); })
   );
+  const guestsSelect = document.getElementById('pubCalGuests');
+  if (guestsSelect) guestsSelect.addEventListener('change', () => { pubGuests = parseInt(guestsSelect.value, 10) || 1; updateSelectionUI(); });
   const prev = document.getElementById('pubCalPrev');
   const next = document.getElementById('pubCalNext');
   if (prev) prev.addEventListener('click', () => { pubMonth--; if (pubMonth < 0) { pubMonth = 11; pubYear--; } render(); });
@@ -133,5 +182,6 @@
   const whats = document.getElementById('pubCalWhats');
   if (whats) whats.addEventListener('click', e => { if (whats.classList.contains('is-disabled')) e.preventDefault(); });
 
+  renderGuestOptions();
   render();
 })();

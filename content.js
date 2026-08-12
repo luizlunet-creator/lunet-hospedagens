@@ -23,6 +23,17 @@ const SITE_CONTENT = {
     privacyPolicy: "Este site não usa formulários que coletem seus dados nem cookies de rastreamento. Ao clicar em WhatsApp, Instagram ou Airbnb, você é direcionado para o aplicativo correspondente, que segue a própria política de privacidade dele."
   },
 
+  // Coordenadas reais (OpenStreetMap) pro mapa do site. O primeiro ponto é o
+  // próprio prédio; os demais são referências pra situar o hóspede na região.
+  mapPoints: [
+    { name: "Prédio Lunet", lat: -26.9092, lng: -48.7020, kind: "home", blurb: "Rua Prof. Eroltides da Silva Fontes, esquina com Rua Joaçaba" },
+    { name: "Praia Brava", lat: -26.9489, lng: -48.6372, kind: "poi" },
+    { name: "Marina de Itajaí", lat: -26.9119, lng: -48.6521, kind: "poi" },
+    { name: "Centreventos Itajaí", lat: -26.9096, lng: -48.6530, kind: "poi" },
+    { name: "Balneário Camboriú (Centro)", lat: -26.9926, lng: -48.6324, kind: "poi" },
+    { name: "Beto Carrero World", lat: -26.8042, lng: -48.6204, kind: "poi" }
+  ],
+
   listings: [
     {
       id: "airbnb06",
