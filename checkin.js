@@ -59,7 +59,7 @@
     if (adultos < 1) { showError('Informe pelo menos 1 adulto.'); return; }
 
     const linhas = [
-      '*Ficha de check-in — Prédio Lunet*',
+      '*Ficha de check-in — Lunet Hospedagens*',
       `Apartamento: ${apt}`,
       `Nome: ${nome}`,
       `Documento: ${doc}`,

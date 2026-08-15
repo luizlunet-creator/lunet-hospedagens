@@ -9,7 +9,7 @@ const AIRBNB_AP06_URL = "https://www.airbnb.com.br/rooms/1711835880981110744";
 
 const SITE_CONTENT = {
   business: {
-    brand: "Prédio Lunet",
+    brand: "Lunet Hospedagens",
     tagline: "Apartamentos para temporada em Itajaí, SC",
     city: "Itajaí, Santa Catarina",
     address: "Rua Professora Eroltides da Silva Fontes, 1500 — esquina com Rua Joaçaba, Itajaí - SC",
@@ -19,14 +19,14 @@ const SITE_CONTENT = {
     heroVideo: null,
     intro: "Conforto, praticidade e uma localização estratégica em Itajaí. Nossos apartamentos foram preparados para receber famílias, casais e profissionais que procuram uma hospedagem organizada, segura e confortável.",
     mapsEmbedUrl: "",
-    houseRules: "",
+    houseRules: "Acesso ao apartamento\nOs hóspedes têm acesso total ao apartamento reservado: quartos, cozinha completa, banheiro e sacada com vista. Também podem usar as áreas comuns do prédio, como corredores e escadas. O acesso é por fechadura eletrônica — não precisa de chave, só da tag fornecida no check-in.\n\nAtendimento durante a estadia\nRespondemos rapidamente pelo WhatsApp a qualquer dúvida, antes ou durante a estadia.\n\nRegras da casa\n• Não é permitido fumar dentro do apartamento.\n• Não são permitidas festas ou eventos.\n• Não é permitido hospedar animais de estimação.\n• Por se tratar de prédio residencial, pedimos silêncio das 22h às 8h.\n• O acesso ao apartamento é feito por escada (sem elevador).\n\nQualquer dúvida, é só chamar no WhatsApp.",
     privacyPolicy: "Este site não usa formulários que coletem seus dados nem cookies de rastreamento. Ao clicar em WhatsApp, Instagram ou Airbnb, você é direcionado para o aplicativo correspondente, que segue a própria política de privacidade dele."
   },
 
   // Coordenadas reais (OpenStreetMap) pro mapa do site. O primeiro ponto é o
   // próprio prédio; os demais são referências pra situar o hóspede na região.
   mapPoints: [
-    { name: "Prédio Lunet", lat: -26.9092, lng: -48.7020, kind: "home", blurb: "Rua Prof. Eroltides da Silva Fontes, esquina com Rua Joaçaba" },
+    { name: "Lunet Hospedagens", lat: -26.9092, lng: -48.7020, kind: "home", blurb: "Rua Prof. Eroltides da Silva Fontes, esquina com Rua Joaçaba" },
     { name: "Praia Brava", lat: -26.9489, lng: -48.6372, kind: "poi" },
     { name: "Marina de Itajaí", lat: -26.9119, lng: -48.6521, kind: "poi" },
     { name: "Centreventos Itajaí", lat: -26.9096, lng: -48.6530, kind: "poi" },
@@ -45,7 +45,7 @@ const SITE_CONTENT = {
       bedrooms: 2,
       beds: 2,
       guests: 4,
-      description: "Apartamento equipado no Prédio Lunet, a poucos minutos do centro de Itajaí e do bairro São Vicente. Cozinha completa com bancada em mármore preto e dourado, dois quartos com ar-condicionado, banheiro com box de vidro e frigobar sempre abastecido — tudo pensado para você chegar e já se sentir em casa.",
+      description: "Apartamento equipado no Lunet Hospedagens, a poucos minutos do centro de Itajaí e do bairro São Vicente. Cozinha completa com bancada em mármore preto e dourado, dois quartos com ar-condicionado, banheiro com box de vidro e frigobar sempre abastecido — tudo pensado para você chegar e já se sentir em casa.",
       amenities: [
         "Cozinha completa (fogão, air fryer, cafeteira, chaleira elétrica)",
         "2 quartos com ar-condicionado",
@@ -93,7 +93,7 @@ const SITE_CONTENT = {
       bedrooms: 2,
       beds: 2,
       guests: 4,
-      description: "O mais novo apartamento do Prédio Lunet, com cozinha integrada à sala, bancada em mármore branco com veios pretos e cantinho para refeições. Fotos do banheiro e versões sem legenda das demais fotos chegando em breve — fale pelo WhatsApp ou consulte o Airbnb para disponibilidade e valores.",
+      description: "O mais novo apartamento do Lunet Hospedagens, com cozinha integrada à sala, bancada em mármore branco com veios pretos e cantinho para refeições. Fotos do banheiro e versões sem legenda das demais fotos chegando em breve — fale pelo WhatsApp ou consulte o Airbnb para disponibilidade e valores.",
       amenities: [
         "Cozinha completa integrada à sala",
         "Sala com sofá",
