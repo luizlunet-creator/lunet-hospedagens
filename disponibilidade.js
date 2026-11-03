@@ -9,12 +9,12 @@
 // aqui. Uma falha ao baixar/ler um calendario NUNCA apaga a disponibilidade
 // anterior — nesse caso o arquivo so' e' deixado como estava.
 window.LUNET_AVAILABILITY = {
-  "generatedAt": "2026-11-03T09:52:50.361Z",
+  "generatedAt": "2026-11-03T17:25:44.652Z",
   "blocks": [
     {
       "apt": "airbnb5",
       "from": "2026-10-31",
-      "to": "2026-11-03"
+      "to": "2026-11-05"
     },
     {
       "apt": "airbnb5",
